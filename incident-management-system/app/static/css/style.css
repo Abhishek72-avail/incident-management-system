@@ -1,0 +1,88 @@
+/* app/static/css/style.css */
+body {
+    background-color: #f8f9fa;
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border-radius: 0.5rem;
+    border: none;
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    background-color: #fff;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 1rem 1.25rem;
+}
+
+.footer {
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.list-group-item {
+    border: none;
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.05);
+}
+
+.list-group-item:last-child {
+    margin-bottom: 0;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+}
+
+.comment {
+    position: relative;
+}
+
+.badge {
+    font-weight: 500;
+    padding: 0.5em 0.75em;
+}
+
+/* Priority Colors */
+.priority-low {
+    color: #28a745;
+}
+
+.priority-medium {
+    color: #fd7e14;
+}
+
+.priority-high {
+    color: #dc3545;
+}
+
+.priority-critical {
+    color: #6610f2;
+}
+
+/* Status Colors */
+.status-open {
+    color: #6c757d;
+}
+
+.status-in_progress {
+    color: #007bff;
+}
+
+.status-resolved {
+    color: #28a745;
+}
+
+.status-closed {
+    color: #343a40;
+}

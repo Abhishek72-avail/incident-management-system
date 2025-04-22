@@ -1,0 +1,52 @@
+<!-- app/templates/index.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="px-4 py-5 my-5 text-center">
+    <h1 class="display-5 fw-bold text-body-emphasis">Incident Management System</h1>
+    <div class="col-lg-6 mx-auto">
+        <p class="lead mb-4">A comprehensive solution for logging, tracking, and resolving infrastructure and application issues.</p>
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('incidents.dashboard') }}" class="btn btn-primary btn-lg px-4 gap-3">Go to Dashboard</a>
+            {% else %}
+            <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg px-4 gap-3">Login</a>
+            <a href="{{ url_for('auth.register') }}" class="btn btn-outline-secondary btn-lg px-4">Register</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="container px-4 py-5">
+    <h2 class="pb-2 border-bottom">Features</h2>
+    <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+        <div class="col d-flex align-items-start">
+            <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <div>
+                <h3 class="fs-2 text-body-emphasis">Incident Tracking</h3>
+                <p>Log and track incidents with detailed information including priority, status, and assignee.</p>
+            </div>
+        </div>
+        <div class="col d-flex align-items-start">
+            <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                <i class="fas fa-users"></i>
+            </div>
+            <div>
+                <h3 class="fs-2 text-body-emphasis">Role-Based Access</h3>
+                <p>Different roles with appropriate permissions to manage and resolve incidents.</p>
+            </div>
+        </div>
+        <div class="col d-flex align-items-start">
+            <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                <i class="fas fa-bell"></i>
+            </div>
+            <div>
+                <h3 class="fs-2 text-body-emphasis">Notifications</h3>
+                <p>Receive email notifications for new incidents, assignments, and status updates.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

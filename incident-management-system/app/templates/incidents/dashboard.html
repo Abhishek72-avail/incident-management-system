@@ -1,0 +1,175 @@
+<!-- app/templates/incidents/dashboard.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="mb-4">Dashboard</h1>
+
+<div class="row">
+    <div class="col-md-3 mb-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h5 class="card-title">Total Incidents</h5>
+                <h2 class="card-text">{{ total_incidents }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <h5 class="card-title">Open</h5>
+                <h2 class="card-text">{{ open_count }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <h5 class="card-title">In Progress</h5>
+                <h2 class="card-text">{{ in_progress_count }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h5 class="card-title">Resolved</h5>
+                <h2 class="card-text">{{ resolved_count }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">My Assigned Incidents</h5>
+                <a href="{{ url_for('incidents.list_incidents') }}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body">
+                {% if my_incidents %}
+                <div class="list-group">
+                    {% for incident in my_incidents %}
+                    <a href="{{ url_for('incidents.view_incident', incident_id=incident.id) }}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{ incident.title }}</h5>
+                            <small>{{ incident.created_at.strftime('%Y-%m-%d') }}</small>
+                        </div>
+                        <p class="mb-1">{{ incident.description|truncate(100) }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <span class="badge bg-{% if incident.priority == 'high' %}danger{% elif incident.priority == 'medium' %}warning{% else %}success{% endif %}">
+                                    {{ incident.priority }}
+                                </span>
+                                <!-- Continue from the dashboard template -->
+                                <span class="badge bg-{% if incident.status == 'open' %}secondary{% elif incident.status == 'in_progress' %}info{% elif incident.status == 'resolved' %}success{% else %}dark{% endif %}">
+                                    {{ incident.status }}
+                                </span>
+                            </small>
+                            <small>{{ incident.incident_type }}</small>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No incidents assigned to you.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Recently Created Incidents</h5>
+                <a href="{{ url_for('incidents.create_incident') }}" class="btn btn-sm btn-outline-primary">Create New</a>
+            </div>
+            <div class="card-body">
+                {% if created_incidents %}
+                <div class="list-group">
+                    {% for incident in created_incidents %}
+                    <a href="{{ url_for('incidents.view_incident', incident_id=incident.id) }}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{ incident.title }}</h5>
+                            <small>{{ incident.created_at.strftime('%Y-%m-%d') }}</small>
+                        </div>
+                        <p class="mb-1">{{ incident.description|truncate(100) }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <span class="badge bg-{% if incident.priority == 'high' %}danger{% elif incident.priority == 'medium' %}warning{% else %}success{% endif %}">
+                                    {{ incident.priority }}
+                                </span>
+                                <span class="badge bg-{% if incident.status == 'open' %}secondary{% elif incident.status == 'in_progress' %}info{% elif incident.status == 'resolved' %}success{% else %}dark{% endif %}">
+                                    {{ incident.status }}
+                                </span>
+                            </small>
+                            <small>{{ incident.incident_type }}</small>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No incidents created by you.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Open Incidents</h5>
+                <a href="{{ url_for('incidents.list_incidents') }}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body">
+                {% if open_incidents %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Assignee</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for incident in open_incidents %}
+                            <tr>
+                                <td>{{ incident.id }}</td>
+                                <td>{{ incident.title }}</td>
+                                <td>{{ incident.incident_type }}</td>
+                                <td>
+                                    <span class="badge bg-{% if incident.priority == 'high' %}danger{% elif incident.priority == 'medium' %}warning{% elif incident.priority == 'critical' %}dark{% else %}success{% endif %}">
+                                        {{ incident.priority }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-{% if incident.status == 'open' %}secondary{% elif incident.status == 'in_progress' %}info{% elif incident.status == 'resolved' %}success{% else %}dark{% endif %}">
+                                        {{ incident.status }}
+                                    </span>
+                                </td>
+                                <td>{{ incident.assignee.username if incident.assignee else 'Unassigned' }}</td>
+                                <td>{{ incident.created_at.strftime('%Y-%m-%d') }}</td>
+                                <td>
+                                    <a href="{{ url_for('incidents.view_incident', incident_id=incident.id) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No open incidents.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

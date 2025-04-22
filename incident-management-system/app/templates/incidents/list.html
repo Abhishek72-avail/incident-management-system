@@ -1,0 +1,111 @@
+<!-- app/templates/incidents/list.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>All Incidents</h1>
+    <a href="{{ url_for('incidents.create_incident') }}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Create Incident
+    </a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Filters</h5>
+    </div>
+    <div class="card-body">
+        <form action="{{ url_for('incidents.list_incidents') }}" method="GET" class="row g-3">
+            <div class="col-md-4">
+                <label for="status" class="form-label">Status</label>
+                <select name="status" id="status" class="form-select">
+                    <option value="">All</option>
+                    <option value="open" {% if status_filter == 'open' %}selected{% endif %}>Open</option>
+                    <option value="in_progress" {% if status_filter == 'in_progress' %}selected{% endif %}>In Progress</option>
+                    <option value="resolved" {% if status_filter == 'resolved' %}selected{% endif %}>Resolved</option>
+                    <option value="closed" {% if status_filter == 'closed' %}selected{% endif %}>Closed</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="priority" class="form-label">Priority</label>
+                <select name="priority" id="priority" class="form-select">
+                    <option value="">All</option>
+                    <option value="low" {% if priority_filter == 'low' %}selected{% endif %}>Low</option>
+                    <option value="medium" {% if priority_filter == 'medium' %}selected{% endif %}>Medium</option>
+                    <option value="high" {% if priority_filter == 'high' %}selected{% endif %}>High</option>
+                    <option value="critical" {% if priority_filter == 'critical' %}selected{% endif %}>Critical</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="type" class="form-label">Type</label>
+                <select name="type" id="type" class="form-select">
+                    <option value="">All</option>
+                    <option value="infrastructure" {% if type_filter == 'infrastructure' %}selected{% endif %}>Infrastructure</option>
+                    <option value="application" {% if type_filter == 'application' %}selected{% endif %}>Application</option>
+                    <option value="security" {% if type_filter == 'security' %}selected{% endif %}>Security</option>
+                    <option value="network" {% if type_filter == 'network' %}selected{% endif %}>Network</option>
+                    <option value="database" {% if type_filter == 'database' %}selected{% endif %}>Database</option>
+                    <option value="other" {% if type_filter == 'other' %}selected{% endif %}>Other</option>
+                </select>
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">Apply Filters</button>
+                <a href="{{ url_for('incidents.list_incidents') }}" class="btn btn-outline-secondary">Clear Filters</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Incidents</h5>
+    </div>
+    <div class="card-body">
+        {% if incidents %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Type</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Creator</th>
+                        <th>Assignee</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for incident in incidents %}
+                    <tr>
+                        <td>{{ incident.id }}</td>
+                        <td>{{ incident.title }}</td>
+                        <td>{{ incident.incident_type }}</td>
+                        <td>
+                            <span class="badge bg-{% if incident.priority == 'high' %}danger{% elif incident.priority == 'medium' %}warning{% elif incident.priority == 'critical' %}dark{% else %}success{% endif %}">
+                                {{ incident.priority }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge bg-{% if incident.status == 'open' %}secondary{% elif incident.status == 'in_progress' %}info{% elif incident.status == 'resolved' %}success{% else %}dark{% endif %}">
+                                {{ incident.status }}
+                            </span>
+                        </td>
+                        <td>{{ incident.creator.username }}</td>
+                        <td>{{ incident.assignee.username if incident.assignee else 'Unassigned' }}</td>
+                        <td>{{ incident.created_at.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            <a href="{{ url_for('incidents.view_incident', incident_id=incident.id) }}" class="btn btn-sm btn-outline-primary">View</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted">No incidents found matching the filters.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

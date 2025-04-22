@@ -1,0 +1,163 @@
+<!-- app/templates/incidents/view.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Incident #{{ incident.id }}</h1>
+    <div>
+        <a href="{{ url_for('incidents.list_incidents') }}" class="btn btn-outline-secondary me-2">
+            Back to All Incidents
+        </a>
+        {% if current_user.id == incident.creator_id or current_user.role in ['admin', 'manager'] %}
+        <a href="{{ url_for('incidents.edit_incident', incident_id=incident.id) }}" class="btn btn-outline-primary">
+            <i class="fas fa-edit me-2"></i>Edit
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">{{ incident.title }}</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">{{ incident.description|nl2br }}</p>
+                <hr>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Created by:</strong> {{ incident.creator.username }}</p>
+                        <p><strong>Created at:</strong> {{ incident.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                        <p><strong>Updated at:</strong> {{ incident.updated_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p>
+                            <strong>Priority:</strong>
+                            <span class="badge bg-{% if incident.priority == 'high' %}danger{% elif incident.priority == 'medium' %}warning{% elif incident.priority == 'critical' %}dark{% else %}success{% endif %}">
+                                {{ incident.priority }}
+                            </span>
+                        </p>
+                        <p>
+                            <strong>Status:</strong>
+                            <span class="badge bg-{% if incident.status == 'open' %}secondary{% elif incident.status == 'in_progress' %}info{% elif incident.status == 'resolved' %}success{% else %}dark{% endif %}">
+                                {{ incident.status }}
+                            </span>
+                        </p>
+                        <p><strong>Type:</strong> {{ incident.incident_type }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Comments</h5>
+            </div>
+            <div class="card-body">
+                {% if comments %}
+                <div class="comment-list">
+                    {% for comment in comments %}
+                    <div class="comment mb-3">
+                        <div class="d-flex">
+                            <div class="flex-shrink-0">
+                                <div class="avatar bg-light rounded-circle p-2">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>{{ comment.author.username }}</strong>
+                                        <small class="text-muted ms-2">{{ comment.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                                    </div>
+                                </div>
+                                <p class="mt-2">{{ comment.content|nl2br }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% if not loop.last %}<hr>{% endif %}
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No comments yet.</p>
+                {% endif %}
+
+                <form method="POST" action="{{ url_for('incidents.add_comment', incident_id=incident.id) }}" class="mt-4">
+                    {{ comment_form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ comment_form.content.label(class="form-label") }}
+                        {{ comment_form.content(class="form-control", rows="3") }}
+                    </div>
+                    <div class="d-grid">
+                        {{ comment_form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Assignee</h5>
+            </div>
+            <div class="card-body">
+                {% if incident.assignee %}
+                <p><strong>Assigned to:</strong> {{ incident.assignee.username }}</p>
+                {% else %}
+                <p class="text-muted">Not assigned</p>
+                {% endif %}
+
+                {% if current_user.role in ['admin', 'manager'] %}
+                <div class="d-grid">
+                    <a href="{{ url_for('incidents.assign_incident', incident_id=incident.id) }}" class="btn btn-outline-primary">
+                        <i class="fas fa-user-plus me-2"></i>{% if incident.assignee %}Reassign{% else %}Assign{% endif %}
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Status Management</h5>
+            </div>
+            <div class="card-body">
+                {% if current_user.id == incident.assignee_id or current_user.role in ['admin', 'manager'] %}
+                <form method="POST" action="{{ url_for('incidents.update_status', incident_id=incident.id) }}">
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Update Status</label>
+                        <select name="status" id="status" class="form-select">
+                            <option value="open" {% if incident.status == 'open' %}selected{% endif %}>Open</option>
+                            <option value="in_progress" {% if incident.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                            <option value="resolved" {% if incident.status == 'resolved' %}selected{% endif %}>Resolved</option>
+                            <option value="closed" {% if incident.status == 'closed' %}selected{% endif %}>Closed</option>
+                        </select>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Update Status</button>
+                    </div>
+                </form>
+                {% else %}
+                <p class="text-muted">You need to be assigned to this incident or be an admin/manager to update its status.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if incident.resolved_at %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Resolution</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Resolved at:</strong> {{ incident.resolved_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                <p><strong>Resolution Time:</strong> 
+                    {{ ((incident.resolved_at - incident.created_at).total_seconds() / 3600)|round(1) }} hours
+                </p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

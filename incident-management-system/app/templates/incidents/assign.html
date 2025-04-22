@@ -1,0 +1,35 @@
+<!-- app/templates/incidents/assign.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Assign Incident #{{ incident.id }}</h1>
+    <a href="{{ url_for('incidents.view_incident', incident_id=incident.id) }}" class="btn btn-outline-secondary">
+        Back to Incident
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">{{ incident.title }}</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('incidents.assign_incident', incident_id=incident.id) }}">
+            <div class="mb-3">
+                <label for="assignee_id" class="form-label">Select Assignee</label>
+                <select name="assignee_id" id="assignee_id" class="form-select">
+                    <option value="">-- Unassigned --</option>
+                    {% for user in users %}
+                    <option value="{{ user.id }}" {% if incident.assignee_id == user.id %}selected{% endif %}>
+                        {{ user.username }} ({{ user.role }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary">Assign</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
